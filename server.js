@@ -1,12 +1,22 @@
 import express from 'express';
+import cors from 'cors';
 import bodyParser from 'body-parser';
 import { translate } from './translate.js';
 
-const app = express();
-const PORT = 9000;
-const allowAlternative = true;
+const app = express(),
+  PORT = 9000,
+  allowAlternative = true,
+  CORS = {
+    origin: false, // 默认关闭跨域访问，还支持指定多个域名或正则表达式
+    methods: 'GET,POST',
+    allowedHeaders: 'Content-Type',
+    preflightContinue: false
+  };
 
+// 其他平台支持配置CORS，我就不兼容了
+app.use(cors(CORS));
 app.use(bodyParser.json());
+
 // 为了方便兼容多平台才这样写
 app.post('/translate', async (req, res) => await post(req, res));
 app.get('/', async (req, res) => await get(req, res));
@@ -24,7 +34,7 @@ async function post(req, res) {
     });
   }
 
-  // 判断是否备选翻译
+  // 是否允许备选翻译
   if (!allowAlternative) alt_count = 0;
   const { text, source_lang, target_lang, alt_count } = req.body;
 
@@ -58,7 +68,7 @@ async function post(req, res) {
 async function get(req, res) {
   res.json({
     code: 200,
-    message: "Welcome to the DeepL Free API. Please POST to '/translate'. Visit 'https://github.com/OwO-Network/DeepLX' and 'https://github.com/guobao2333/DeepLX-Serverless' for more information."
+    message: "Welcome to the DeepL Free API. Please POST to '/translate'. This program is published in accordance with the terms of GNU/AGPLv3. Visit 'https://github.com/guobao2333/DeepLX-Serverless' for more information."
   });
 };
 
